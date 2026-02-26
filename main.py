@@ -167,7 +167,7 @@ class MainFrame(wx.Frame):
 
     def _check_app_updates(self):
         try:
-            repo_api = "https://api.github.com/repos/bertidiego/SkinX/releases/latest"
+            repo_api = "https://api.github.com/repos/oxideve/SkinX/releases/latest"
             r = requests.get(repo_api, timeout=5)
             if r.status_code == 200:
                 latest = r.json().get("tag_name", "").replace("v", "")
@@ -186,7 +186,7 @@ class MainFrame(wx.Frame):
         try:
             with open(self.config_path, 'r') as f: config = json.load(f)
             installed_shas = config.get("installed_shas", {})
-            sources = config.get("sources", ["https://api.github.com/repos/bertidiego/SkinX-icons/branches"])
+            sources = config.get("sources", ["https://api.github.com/repos/oxideve/SkinX-icons/branches"])
             
             for api_url in sources:
                 r = requests.get(api_url, timeout=10)

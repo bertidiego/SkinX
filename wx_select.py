@@ -119,7 +119,7 @@ class VersionSelectFrame(wx.Dialog):
         return {}
 
     def _get_sources_from_config(self):
-        default = ["https://api.github.com/repos/bertidiego/SkinX-icons/branches"]
+        default = ["https://api.github.com/repos/oxideve/SkinX-icons/branches"]
         if os.path.exists(self.config_path):
             try:
                 with open(self.config_path, 'r') as f:

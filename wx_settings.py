@@ -69,7 +69,7 @@ class SettingsFrame(wx.Frame):
         
         self.helper = PatcherHelper()
         self.config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
-        self.default_source = "https://api.github.com/repos/bertidiego/SkinX-icons/branches"
+        self.default_source = "https://api.github.com/repos/oxideve/SkinX-icons/branches"
         self.original_lang = LM.current_lang 
         
         self.SetBackgroundColour(wx.Colour(245, 245, 247))

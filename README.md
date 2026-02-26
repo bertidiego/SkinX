@@ -22,7 +22,7 @@ SkinX is a powerful and lightweight tool designed for macOS users who want to cu
 * **fileicon**: The utility for managing custom icons. SkinX will offer to install it for you if it's missing (requires Homebrew).
 
 ### Installation
-1. Go to the [Releases](https://github.com/bertidiego/SkinX/releases) page.
+1. Go to the [Releases](https://github.com/oxideve/SkinX/releases) page.
 2. Download the latest `SkinX_Installer.dmg`.
 3. Open the DMG and drag **SkinX** to your **Applications** folder.
 4. Right-click the app and select **Open** to bypass the "Unidentified Developer" warning (since the app is self-signed).
@@ -72,7 +72,7 @@ To run the source code locally:
 
 1. **Clone the repo**:
    ```bash
-   git clone [https://github.com/bertidiego/SkinX.git](https://github.com/bertidiego/SkinX.git)
+   git clone [https://github.com/oxideve/SkinX.git](https://github.com/oxideve/SkinX.git)
    cd SkinX
 
 1. **Install the dependencies**:
