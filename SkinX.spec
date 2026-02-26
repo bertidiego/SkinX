@@ -6,7 +6,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[('assets', 'assets'), ('lang', 'lang')],
-    hiddenimports=['PIL._tkinter_finder'],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -33,6 +33,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon=['assets/icon.icns'],
+    contents_directory='Contents',
 )
 coll = COLLECT(
     exe,

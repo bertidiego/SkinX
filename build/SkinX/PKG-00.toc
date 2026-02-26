@@ -8,7 +8,7 @@
   'PYZ': False,
   'SPLASH': True,
   'SYMLINK': False},
- [('pyi-contents-directory _internal', '', 'OPTION'),
+ [('pyi-contents-directory Contents', '', 'OPTION'),
   ('PYZ-00.pyz',
    '/Users/diegoberti/Desktop/SkinZ/build/SkinX/PYZ-00.pyz',
    'PYZ'),

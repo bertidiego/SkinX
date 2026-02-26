@@ -3,12 +3,22 @@ import os
 import requests
 import threading
 import json
+import sys  # Necessario per resource_path
 from PIL import Image as PILImage
 from data import Data
 from wx_select import VersionSelectFrame
 from helper import PatcherHelper
 from locales import LM 
 from wx_settings import SettingsFrame
+
+def resource_path(relative_path):
+    """ Ottiene il percorso assoluto delle risorse, compatibile con PyInstaller """
+    try:
+        # PyInstaller crea una cartella temporanea e memorizza il percorso in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 class IconSelectorDialog(wx.Dialog):
     def __init__(self, parent, available_patches):
@@ -18,7 +28,7 @@ class IconSelectorDialog(wx.Dialog):
         self.available = available_patches
         self.helper = PatcherHelper()
         self.checks = []
-        self.rows = [] # Per la ricerca fuzzy
+        self.rows = []
         self.SetBackgroundColour(wx.Colour(245, 245, 247))
         
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -26,7 +36,6 @@ class IconSelectorDialog(wx.Dialog):
         header.SetFont(wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName=".AppleSystemUIFont"))
         main_sizer.Add(header, 0, wx.ALL | wx.CENTER, 15)
 
-        # BARRA DI RICERCA
         self.search = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.search.SetHint("Search apps...")
         self.search.Bind(wx.EVT_TEXT, self.on_search)
@@ -41,9 +50,7 @@ class IconSelectorDialog(wx.Dialog):
             row_panel = wx.Panel(self.scroll)
             row_sizer = wx.BoxSizer(wx.HORIZONTAL)
             
-            # LOGICA SMART SELECTION: Deseleziona se già applicata
             is_patched = self.helper.check_if_patched(item['app_name'])
-            
             cb = wx.CheckBox(row_panel, label="")
             cb.SetValue(not is_patched) 
             self.checks.append(cb)
@@ -84,7 +91,6 @@ class IconSelectorDialog(wx.Dialog):
             line = wx.StaticLine(self.scroll)
             self.scroll_sizer.Add(line, 0, wx.EXPAND)
             
-            # Salviamo il riferimento per il filtro
             self.rows.append({'panel': row_panel, 'line': line, 'name': item['app_name'].lower()})
 
         self.scroll.SetSizer(self.scroll_sizer)
@@ -128,6 +134,7 @@ class IconSelectorDialog(wx.Dialog):
 class MainFrame(wx.Frame):
     def __init__(self, parent):
         self.constants = Data()
+        # Il config rimane fuori dal bundle per poter essere scritto
         self.config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
         self._load_saved_language()
         
@@ -135,6 +142,11 @@ class MainFrame(wx.Frame):
         super(MainFrame, self).__init__(parent, title=full_title, size=(650, 420), 
                                         style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
         
+        # Imposta l'icona dell'app nel dock/finestra
+        icon_path = resource_path("assets/icon.icns")
+        if os.path.exists(icon_path):
+            self.SetIcon(wx.Icon(icon_path, wx.BITMAP_TYPE_ICON))
+
         self.helper = PatcherHelper()
         self.font_model = wx.Font(13, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName=".AppleSystemUIFont")
         self.font_desc = wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName=".AppleSystemUIFont")
@@ -154,7 +166,6 @@ class MainFrame(wx.Frame):
         except: LM.load_language("it_it")
 
     def _check_app_updates(self):
-        """Verifica aggiornamenti dell'applicazione SkinX"""
         try:
             repo_api = "https://api.github.com/repos/bertidiego/SkinX/releases/latest"
             r = requests.get(repo_api, timeout=5)
@@ -185,8 +196,7 @@ class MainFrame(wx.Frame):
                         remote_sha = branch.get('commit', {}).get('sha')
                         
                         if name in installed_shas:
-                            local_sha = installed_shas[name]
-                            if local_sha != remote_sha:
+                            if installed_shas[name] != remote_sha:
                                 wx.CallAfter(self._show_update_popup, name)
                                 return 
         except: pass
@@ -217,8 +227,10 @@ class MainFrame(wx.Frame):
 
         bx, by, idx = 55, 95, 0
         for cfg in menu_configs:
-            if os.path.exists(cfg["icon"]):
-                img = wx.Image(cfg["icon"], wx.BITMAP_TYPE_ANY).Rescale(1024, 1024, wx.IMAGE_QUALITY_HIGH)
+            # CORREZIONE: Usiamo resource_path per le icone del menu
+            icon_p = resource_path(cfg["icon"])
+            if os.path.exists(icon_p):
+                img = wx.Image(icon_p, wx.BITMAP_TYPE_ANY).Rescale(1024, 1024, wx.IMAGE_QUALITY_HIGH)
                 wx.StaticBitmap(self, bitmap=wx.Bitmap(img), pos=(bx - 15, by), size=(80, 80))
 
             btn = wx.Button(self, label=LM.get(cfg["key"]), pos=(bx + 75, by), size=(180, 30))
@@ -267,19 +279,15 @@ class MainFrame(wx.Frame):
                 self.helper.restore_icons(self); self._refresh_pack_label()
             return
         
-        # Controllo se esistono branches scaricate
         dl_path = self.helper.downloads_path
         has_downloads = False
         if os.path.exists(dl_path):
-            # Filtra cartelle valide escludendo file nascosti (es. .DS_Store)
             folders = [f for f in os.listdir(dl_path) if os.path.isdir(os.path.join(dl_path, f)) and not f.startswith('.')]
             if folders:
                 has_downloads = True
 
         if not has_downloads:
-            # Avviso localizzato (assicurati di avere MSG_NO_BRANCHES_DOWNLOADED nel JSON)
             wx.MessageBox(LM.get("MSG_NO_BRANCHES_DOWNLOADED"), "SkinX Info", wx.OK | wx.ICON_INFORMATION)
-            # Rimanda automaticamente al selettore versioni
             self.on_select_version(None)
             return
 

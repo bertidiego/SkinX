@@ -1,0 +1,43 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- macOS System Files ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+*.lp
+
+# --- SkinX Specific ---
+# Ignora i download delle icone per non appesantire la repo del codice
+downloads/
+# Ignora il file di configurazione locale che contiene i tuoi test/SHA
+config.json
+
+# --- Build & Installer ---
+# Ignora i file generati da PyInstaller e create-dmg
+*.spec
+dist/
+build/
+*.dmg
